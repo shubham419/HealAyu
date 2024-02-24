@@ -12,9 +12,13 @@ export default function App() {
   return (
     <RootSiblingParent>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="">
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName=""
+        >
           <Stack.Screen
-
             name="Authentication"
             options={{ headerShown: false }}
             component={AuthNavigation}
