@@ -18,7 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 const PhoneNumberScreen = () => {
   // const [value, setValue] = useState("");  // use to handle +91 condition.
   const [formattedValue, setFormattedValue] = useState("");
-  const [laoder, setLoader] = useState(false);
+  const [loader, setLoader] = useState(false);
   const phoneInput = useRef(null);
   const navigation = useNavigation();
 
@@ -36,8 +36,11 @@ const PhoneNumberScreen = () => {
   const signInWithPhone = async () => {
     try {
       setLoader(true);
-      await auth().signInWithPhoneNumber(formattedValue);
-      navigation.navigate("OtpScreen");
+      const confirmation = await auth().signInWithPhoneNumber(formattedValue);
+      navigation.navigate("OtpScreen", {
+        confirmation: confirmation,
+        phoneNumber: formattedValue,
+      });
     } catch (e) {
       console.error(e);
     } finally {
@@ -71,8 +74,8 @@ const PhoneNumberScreen = () => {
             autoFocus
           />
         </View>
-        {laoder ? (
-          <View>
+        {loader ? (
+          <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color={Colors.main} />
             <Text>Please Wait...</Text>
           </View>
@@ -91,18 +94,27 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: StatusBar.currentHeight || 0,
   },
 
   heading: {
-    alignSelf: "flex-start",
     fontSize: 18,
     fontWeight: "bold",
     color: Colors.black,
+    marginTop: 25,
   },
   subHeading: {
     fontSize: 13,
     color: Colors.subHeading,
     marginBottom: 20,
+  },
+  loaderContainer: {
+    position: "absolute",
+    flex: 1,
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+    backgroundColor: "rgba(207, 190, 199, 0.75)",
   },
 });

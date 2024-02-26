@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 const AuthNavigation = () => {
   return (
     <NavigationContainer independent>
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName=''>
       <Stack.Screen name="PhoneNumberScreen" options={{ headerShown: false }} component={PhoneNumberScreen} />
       <Stack.Screen name="OtpScreen" options={{ headerShown: false }} component={OtpScreen} />
       <Stack.Screen name="UserTypeScreen" options={{ headerShown: false }} component={UserTypeScreen} />
