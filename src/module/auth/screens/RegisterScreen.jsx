@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useContext } from "react";
 import {
   StyleSheet,
   Text,
@@ -19,6 +19,7 @@ import AuthHeader from "../components/AuthHeader";
 import Colors from "../../../theme/colors";
 import CustomButton from "../../../core/components/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AuthContext from "../../../utils/AuthContext";
 
 const RegisterScreen = ({ route }) => {
   const [userData, setUserData] = useState({
@@ -30,6 +31,7 @@ const RegisterScreen = ({ route }) => {
   const [fileResponse, setFileResponse] = useState(null);
   const [loader, setLoader] = useState(false);
   const navigation = useNavigation();
+  const setIsSignedIn = useContext(AuthContext);
   const doc = DocumentPicker;
 
   const handleInputChange = (field, value) => {
@@ -89,7 +91,8 @@ const RegisterScreen = ({ route }) => {
         await database().ref(`/users/general/${route.params.uid}`).set(data);
       }
       await AsyncStorage.setItem("uid", JSON.stringify(route.params.uid));
-      navigation.reset({ index: 0, routes: [{ name: "Root" }] });
+      // navigation.reset({ index: 0, routes: [{ name: "Root" }] });
+      setIsSignedIn(true);
     } catch (e) {
       console.error(e);
     } finally {

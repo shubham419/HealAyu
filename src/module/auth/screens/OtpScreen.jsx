@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ActivityIndicator } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 // import firestore from "@react-native-firebase/firestore";
 import AuthHeader from "../components/AuthHeader";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -9,11 +9,14 @@ import CustomButton from "../../../core/components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-root-toast";
 import database from "@react-native-firebase/database";
+import AuthContext from "../../../utils/AuthContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OtpScreen = ({ route }) => {
   const confirmation = route.params.confirmation;
   const navigation = useNavigation();
   const [laoder, setLoader] = useState(false);
+  const setIsSignedIn = useContext(AuthContext);
 
   const confirmCode = async (code) => {
     try {
@@ -29,9 +32,10 @@ const OtpScreen = ({ route }) => {
         .ref(`/users/doctor/${user.uid}`)
         .once("value");
 
-      if (existedDoctorUser == null || existedGeneralUser == null) {
+      if (existedDoctorUser.exists() || existedGeneralUser.exists()) {
         await AsyncStorage.setItem("uid", JSON.stringify(user.uid));
-        navigation.reset({ index: 0, routes: [{ name: "Root" }] });
+        // navigation.reset({ index: 0, routes: [{ name: "Root" }] });
+        setIsSignedIn(true);
       } else {
         navigation.pop();
         navigation.navigate("RegisterScreen", { uid: [user.uid] });
