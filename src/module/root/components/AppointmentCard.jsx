@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { MaterialIcons } from '@expo/vector-icons';
+import { TouchableRipple } from "react-native-paper";
 
 const AppointmentCard = ({ data }) => {
   return (
     <View style={styles.container}>
+      <TouchableOpacity activeOpacity={0.3  } onPress={() => {console.log("clicked")}}>
       <View style={styles.row}>
         <MaterialIcons name="person" size={18} color="#555" />
         <Text style={styles.label}>Doctor:</Text>
@@ -30,6 +32,7 @@ const AppointmentCard = ({ data }) => {
         <Text style={styles.label}>Status:</Text>
         <Text style={[styles.value, { color: 'green' }]}>{data.status}</Text>
       </View>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -38,6 +41,7 @@ export default AppointmentCard;
 
 const styles = StyleSheet.create({
   container: {
+    width:"90%",
     backgroundColor: '#f5f5f5',
     padding: 15,
     borderRadius: 10,

@@ -16,7 +16,7 @@ const OtpScreen = ({ route }) => {
   const confirmation = route.params.confirmation;
   const navigation = useNavigation();
   const [laoder, setLoader] = useState(false);
-  const setIsSignedIn = useContext(AuthContext);
+  const {setIsSignedIn} = useContext(AuthContext);
 
   const confirmCode = async (code) => {
     try {
@@ -33,7 +33,9 @@ const OtpScreen = ({ route }) => {
         .once("value");
 
       if (existedDoctorUser.exists() || existedGeneralUser.exists()) {
-        await AsyncStorage.setItem("uid", JSON.stringify(user.uid));
+        await AsyncStorage.setItem("uid", user.uid);
+        // const uid = await AsyncStorage.getItem("uid");
+        // console.log(uid)
         // navigation.reset({ index: 0, routes: [{ name: "Root" }] });
         setIsSignedIn(true);
       } else {

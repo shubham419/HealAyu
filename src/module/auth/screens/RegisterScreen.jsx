@@ -31,7 +31,7 @@ const RegisterScreen = ({ route }) => {
   const [fileResponse, setFileResponse] = useState(null);
   const [loader, setLoader] = useState(false);
   const navigation = useNavigation();
-  const setIsSignedIn = useContext(AuthContext);
+  const { setIsSignedIn } = useContext(AuthContext);
   const doc = DocumentPicker;
 
   const handleInputChange = (field, value) => {
@@ -59,7 +59,7 @@ const RegisterScreen = ({ route }) => {
     }
   };
 
-  const handleDocumentSelection = useCallback(async () => {
+  const handleDocumentSelection = async () => {
     try {
       const response = await doc.pickSingle({
         presentationStyle: "fullScreen",
@@ -77,20 +77,25 @@ const RegisterScreen = ({ route }) => {
     } catch (err) {
       console.warn(err);
     }
-  }, []);
+  }
+
 
   const registerUser = useCallback(async (data) => {
     try {
+      const uid = "" + String(route.params.uid);
       setLoader(true);
       if (data.isDoctor) {
-        database().ref(`/users/doctor/${route.params.uid}`).set(data);
+        console.log(fileResponse)
+        database().ref(`/users/doctor/${uid}`).set(data);
         await storage()
-          .ref(`/users/doctor/${data.name}::${route.params.uid}/certificate`)
+          .ref(`/users/doctor/${data.name}::${uid}/certificate`)
           .putFile(fileResponse.fileCopyUri);
       } else {
-        await database().ref(`/users/general/${route.params.uid}`).set(data);
+        await database().ref(`/users/general/${uid}`).set(data);
       }
-      await AsyncStorage.setItem("uid", JSON.stringify(route.params.uid));
+      await AsyncStorage.setItem("uid", uid);
+      // const uid = await AsyncStorage.getItem("uid");
+      // console.log(uid)
       // navigation.reset({ index: 0, routes: [{ name: "Root" }] });
       setIsSignedIn(true);
     } catch (e) {

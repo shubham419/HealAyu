@@ -5,7 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import AuthNavigation from "./src/module/auth/navigation/AuthNavigation";
 import RootComponent from "./src/module/root/navigation/RootComponent";
 import { RootSiblingParent } from "react-native-root-siblings";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PhoneNumberScreen from "./src/module/auth/screens/PhoneNumberScreen";
 import UserTypeScreen from "./src/module/auth/screens/UserTypeScreen";
 import OtpScreen from "./src/module/auth/screens/OtpScreen";
@@ -20,31 +20,38 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [isSignedIn, setIsSignedIn] = useState(true);
+  const [userData, setUserData] = useState({});
+  // const { setUser } = useAuth();
 
-  async function getUser() {
-    try {
-      const uid = await AsyncStorage.getItem("uid");
-      console.log(uid);
-      if (uid !== null) {
-        setIsSignedIn(true);
-      } else {
-        setIsSignedIn(false);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      await SplashScreen.hideAsync();
-    }
-  }
 
+  
   useEffect(() => {
     getUser();
-  }, []);
+    async function getUser() {
+      try {
+        const uid = await AsyncStorage.getItem("uid");
+        // console.log(uid);
+        if (uid !== null) {
+          console.log("uid set");
+          setUserData({uid});
+          setIsSignedIn(true);
+        } else {
+          console.log("not uid present")
+          setUserData({});
+          setIsSignedIn(false);
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        await SplashScreen.hideAsync();
+      }
+    }
+  }, [isSignedIn]);
 
   return (
     <PaperProvider>
       <RootSiblingParent>
-        <AuthContext.Provider value={setIsSignedIn}>
+        <AuthContext.Provider value={{setIsSignedIn, userData}}>
           <NavigationContainer>
             <Stack.Navigator
               screenOptions={{

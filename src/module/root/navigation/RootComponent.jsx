@@ -8,6 +8,8 @@ import { Feather } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from "../../../theme/colors";
+import SearchScreen from "../screens/search/SearchScreen";
+import DoctorDetailScreen from "../screens/search/DoctorDetailScreen";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -37,12 +39,12 @@ const RootComponent = () => {
         <MaterialCommunityIcons name="bike-fast" size={24} color={color} />
       ))}}
       />
-      <Tab.Screen name="Search Doctor" component={HomeScreen} 
+      <Tab.Screen name="Search Doctor" component={SearchScreen} 
       options={{tabBarIcon: (({color}) => (
         <Ionicons name="search-outline" size={24} color={color} />
       ))}}
       />
-      <Tab.Screen name="Profile" component={HomeScreen} 
+      <Tab.Screen name="Profile" component={DoctorDetailScreen} 
       options={{tabBarIcon: ({color}) => (
         
         <Feather name="user" size={24} color={color} />
