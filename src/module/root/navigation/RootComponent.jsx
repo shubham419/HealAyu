@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "../screens/HomeScreen";
+import HomeScreen from "../screens/home/HomeScreen";
 import { createMaterialBottomTabNavigator } from "react-native-paper/react-navigation";
 import { AntDesign } from "@expo/vector-icons";
 import { Feather } from '@expo/vector-icons';
@@ -10,6 +10,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Colors from "../../../theme/colors";
 import SearchScreen from "../screens/search/SearchScreen";
 import DoctorDetailScreen from "../screens/search/DoctorDetailScreen";
+import AppointmentDetailScreen from "../screens/home/AppointmentDetailScreen";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -34,7 +35,7 @@ const RootComponent = () => {
           ),
         }}
       />
-      <Tab.Screen name="SOS" component={HomeScreen} 
+      <Tab.Screen name="SOS" component={AppointmentDetailScreen} 
       options={{tabBarIcon:(({color}) => (
         <MaterialCommunityIcons name="bike-fast" size={24} color={color} />
       ))}}

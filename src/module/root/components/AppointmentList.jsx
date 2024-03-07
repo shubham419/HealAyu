@@ -7,39 +7,43 @@ import AppointmentCard from "./AppointmentCard";
 import AuthContext from "../../../utils/AuthContext";
 
 const AppointmentList = () => {
-  console.log("render of appointment list");
   const [selectedTab, setSelectedTab] = useState("Upcoming");
   const [appointmentList, setAppointmentList] = useState([]);
   const [filteredList, setFilteredList] = useState([]);
-  // const [userData, setUserData] = useState(null); 
   const {userData} = useContext(AuthContext);
 
-
-  // console.log(userData);
-//   console.log(userData);
   const handleTabPress = (tab) => {
     setSelectedTab(tab);
   };
-  console.log("appointmentList", appointmentList);
+
+  
   useEffect(() => {
-    console.log("useeffect called");
+    function createFinalList(){
+      if(selectedTab == "Upcoming"){
+        const finalList = appointmentList.filter((item) => !(item.status == "completed"));
+        setFilteredList(finalList);
+      }else{
+        const finalList = appointmentList.filter((item) => (item.status == "completed"));
+        setFilteredList(finalList);
+      }
+  
+    }
+    createFinalList();
+  }, [selectedTab, appointmentList])
+
+
+  useEffect(() => {
     async function getData(){
-      console.log("getdata in appointment list called with uid = " + userData.uid)
         try{
             const snapShot = await database().ref(`users/general/${userData.uid}/appointments`).once("value");
-            // console.log(snapShot);
-            // console.log(user);
             const temp = [];
-
             if (snapShot.exists()) {
               snapShot.forEach((item) => {
                 if (item) {
                   temp.push(item.val());
                 }
-                // console.log(item.val());
               });
             }
-            // console.log(temp);
             setAppointmentList(temp);
         }catch(e){
             console.log(e);
@@ -52,9 +56,6 @@ const AppointmentList = () => {
   }, [userData]);
 
 
-  // useEffect(() => {
-  //   setUserData(authContext.userData);
-  // }, [authContext.userData]);
 
   return (
     <View style={styles.container}>
@@ -75,11 +76,9 @@ const AppointmentList = () => {
           <Text style={styles.text}>Past</Text>
         </TouchableOpacity>
       </View>
-      {/* Your appointment list goes here */}
       <View style={styles.appointmentList}>
-        {appointmentList.length ? 
-            appointmentList.map((data, idx) =>{ 
-                if(data)
+        {filteredList.length ? 
+            filteredList.map((data, idx) =>{ 
                     return <AppointmentCard key={idx} data={data} />
                 return null;
                 })
@@ -117,8 +116,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   selectedTab: {
-    borderBottomColor: Colors.main, // Main theme color for the underline of the selected tab
-    backgroundColor: "rgba(238, 75, 43, 0.2)", // Transparent background color
+    borderBottomColor: Colors.main, 
+    backgroundColor: "rgba(238, 75, 43, 0.2)",
     borderBottomWidth: 2,
   },
   appointmentList: {
