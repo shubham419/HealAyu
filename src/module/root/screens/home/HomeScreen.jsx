@@ -5,46 +5,23 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthContext from "../../../../utils/AuthContext";
 import AppointmentList from "../../components/AppointmentList";
-// import {
-//   TabsProvider,
-//   Tabs,
-//   TabScreen,
-//   useTabIndex,
-//   useTabNavigation,
-// } from "react-native-paper-tabs";
+
+import AppointmentDetailScreen from "./AppointmentDetailScreen";
 
 const HomeScreen = ({}) => {
-  const data = {
-    doctorName: "Shubham Thorat",
-    specialist: "Neurosurgeon",
-    time: "6:00 PM",
-    date: "26th Feb",
-    status: "Confirmed",
-  };
+ 
 
   const { setIsSignedIn } = useContext(AuthContext);
   const navigation = useNavigation();
   return (
-    // <TabsProvider defaultIndex={0}>
-    //   <Tabs>
-    //     <TabScreen label="Upcoming">
-    //     <AppointmentList />
-    //     </TabScreen>
-
-    //     <TabScreen label="Past">
-    //     <AppointmentList />
-    //     </TabScreen>
-    //   </Tabs>
-    // </TabsProvider>
-
-    <ScrollView style={styles.cointainer}>
+    <View style={styles.cointainer}>
       {/* <CustomButton title="navigatie to phone screen" handler={() => {
-        AsyncStorage.removeItem("uid");
-        setIsSignedIn(false);
+           AsyncStorage.removeItem("uid");
+         setIsSignedIn(false);
       }}/> */}
-
-      <AppointmentList />
-    </ScrollView>
+      <AppointmentList /> 
+     
+   </View> 
   );
 };
 
