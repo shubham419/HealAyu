@@ -5,7 +5,6 @@ const Colors =  {
     white: "#fff",
     subHeading:"#808080",
 
-    //chat gpt
     primary: "#007bff",
     secondary: "#6c757d",
     success: "#28a745",

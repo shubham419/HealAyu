@@ -20,6 +20,7 @@ import Colors from "../../../theme/colors";
 import CustomButton from "../../../core/components/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthContext from "../../../utils/AuthContext";
+import { storeUser } from "../../../utils/asyncStorage";
 
 const RegisterScreen = ({ route }) => {
   const [userData, setUserData] = useState({
@@ -82,7 +83,7 @@ const RegisterScreen = ({ route }) => {
 
   const registerUser = useCallback(async (data) => {
     try {
-      const uid = "" + String(route.params.uid);
+      const uid = route.params.uid;
       setLoader(true);
       if (data.isDoctor) {
         console.log(fileResponse)
@@ -93,7 +94,7 @@ const RegisterScreen = ({ route }) => {
       } else {
         await database().ref(`/users/general/${uid}`).set(data);
       }
-      await AsyncStorage.setItem("uid", uid);
+      await storeUser ({uid, ...data});
       // const uid = await AsyncStorage.getItem("uid");
       // console.log(uid)
       // navigation.reset({ index: 0, routes: [{ name: "Root" }] });

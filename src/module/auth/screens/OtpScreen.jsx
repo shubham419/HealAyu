@@ -11,6 +11,8 @@ import Toast from "react-native-root-toast";
 import database from "@react-native-firebase/database";
 import AuthContext from "../../../utils/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { storeUser } from "../../../utils/asyncStorage";
+
 
 const OtpScreen = ({ route }) => {
   const confirmation = route.params.confirmation;
@@ -31,12 +33,13 @@ const OtpScreen = ({ route }) => {
       const existedDoctorUser = await database()
         .ref(`/users/doctor/${user.uid}`)
         .once("value");
-
-      if (existedDoctorUser.exists() || existedGeneralUser.exists()) {
-        await AsyncStorage.setItem("uid", user.uid);
-        // const uid = await AsyncStorage.getItem("uid");
-        // console.log(uid)
-        // navigation.reset({ index: 0, routes: [{ name: "Root" }] });
+      console.log(existedDoctorUser,"existedGeneralUser ==>" ,existedGeneralUser);
+      if(existedDoctorUser.exists()){
+        await storeUser({uid : user.uid, isDoctor: true });
+        setIsSignedIn(true);
+      }
+      if (existedGeneralUser.exists()) {
+        await storeUser({uid : user.uid, isDoctor: false });
         setIsSignedIn(true);
       } else {
         navigation.pop();

@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import AuthContext from "./src/utils/AuthContext";
 import { PaperProvider } from "react-native-paper";
+import { getUser } from "./src/utils/asyncStorage";
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
@@ -26,14 +27,13 @@ export default function App() {
 
   
   useEffect(() => {
-    getUser();
-    async function getUser() {
+    getUserData();
+    async function getUserData() {
       try {
-        const uid = await AsyncStorage.getItem("uid");
-        // console.log(uid);
-        if (uid !== null) {
-          console.log("uid set");
-          setUserData({uid});
+        const userData = await getUser();
+        if (userData.uid !== null) {
+          console.log(userData);
+          setUserData(userData);
           setIsSignedIn(true);
         } else {
           console.log("not uid present")

@@ -11,6 +11,7 @@ import Colors from "../../../theme/colors";
 import SearchScreen from "../screens/search/SearchScreen";
 import DoctorDetailScreen from "../screens/search/DoctorDetailScreen";
 import AppointmentDetailScreen from "../screens/home/AppointmentDetailScreen";
+import ProfileScreen from "../screens/profile/ProfileScreen";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -45,7 +46,7 @@ const RootComponent = () => {
         <Ionicons name="search-outline" size={24} color={color} />
       ))}}
       />
-      <Tab.Screen name="Profile" component={DoctorDetailScreen} 
+      <Tab.Screen name="Profile" component={ProfileScreen} 
       options={{tabBarIcon: ({color}) => (
         
         <Feather name="user" size={24} color={color} />

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, StatusBar, ScrollView } from "react-native";
+import { StyleSheet, View, StatusBar, ScrollView } from "react-native";
 import React, { useContext } from "react";
 import CustomButton from "../../../../core/components/CustomButton";
 import { useNavigation } from "@react-navigation/native";
@@ -15,12 +15,7 @@ const HomeScreen = ({}) => {
   const navigation = useNavigation();
   return (
     <View style={styles.cointainer}>
-      {/* <CustomButton title="navigatie to phone screen" handler={() => {
-           AsyncStorage.removeItem("uid");
-         setIsSignedIn(false);
-      }}/> */}
       <AppointmentList /> 
-     
    </View> 
   );
 };
