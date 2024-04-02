@@ -2,11 +2,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { MaterialIcons } from '@expo/vector-icons';
 import { TouchableRipple } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 const AppointmentCard = ({ data }) => {
+
+  const navigation = useNavigation();
+
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity activeOpacity={0.3  } onPress={() => {console.log("clicked")}}>
+      <TouchableOpacity activeOpacity={0.3  } onPress={() => {navigation.navigate('AppointmentDetailScreen', {data})}}>
       <View style={styles.row}>
         <MaterialIcons name="person" size={18} color="#555" />
         <Text style={styles.label}>Doctor:</Text>

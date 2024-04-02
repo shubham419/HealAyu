@@ -14,7 +14,8 @@ import AuthContext from "../../../../utils/AuthContext";
 import DocumentPicker from "react-native-document-picker";
 import Toast from "react-native-root-toast";
 
-const AppointmentDetailScreen = () => {
+const AppointmentDetailScreen = ({ route }) => {
+  const data = route.params.data;
   const doc = DocumentPicker;
   const [fileResponse, setFileResponse] = useState(null);
 
@@ -66,19 +67,19 @@ const AppointmentDetailScreen = () => {
       <View style={styles.card}>
         <View style={styles.detailContainer}>
           <Text style={styles.label}>Date</Text>
-          <Text style={styles.value}>Fri, Feb 23, 2024</Text>
+          <Text style={styles.value}>{data.date}</Text>
         </View>
         <View style={styles.detailContainer}>
           <Text style={styles.label}>Time</Text>
-          <Text style={styles.value}>4:55 PM</Text>
+          <Text style={styles.value}>{data.time}</Text>
         </View>
         <View style={styles.detailContainer}>
           <Text style={styles.label}>Status</Text>
-          <Text style={[styles.value, styles.completed]}>Completed</Text>
+          <Text style={[styles.value, styles.completed]}>{data.status}</Text>
         </View>
         <View style={styles.detailContainer}>
           <Text style={styles.label}>Doctor</Text>
-          <Text style={styles.value}>Shubham Thorat</Text>
+          <Text style={styles.value}>{data.doctorName}</Text>
         </View>
       </View>
       <View style={styles.actionButton}>
