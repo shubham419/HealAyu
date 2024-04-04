@@ -1,12 +1,12 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Avatar } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 const DoctorCard = ({ data }) => {
-  const { name, specialist, experience } = data;
-
+  const navigation = useNavigation()
   return (
-    <TouchableOpacity activeOpacity={0.7}>
+    <TouchableOpacity activeOpacity={0.7} onPress={ () => {navigation.navigate("DoctorDetailScreen", {data} )}}>
       <View style={styles.container}>
         <View style={styles.avatarContainer}>
           <Avatar.Image
@@ -17,15 +17,15 @@ const DoctorCard = ({ data }) => {
         <View style={styles.infoContainer}>
           <View style={styles.row}>
             <Text style={styles.label}>Name:</Text>
-            <Text style={styles.value}>{name}</Text>
+            <Text style={styles.value}>{`${data.name} ${data.lastName}`}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Specialist:</Text>
-            <Text style={styles.value}>{specialist}</Text>
+            <Text style={styles.value}>{data.specialist}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Experience:</Text>
-            <Text style={styles.value}>{experience}</Text>
+            <Text style={styles.value}>{data.experience}</Text>
           </View>
         </View>
       </View>

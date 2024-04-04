@@ -81,30 +81,28 @@ const RegisterScreen = ({ route }) => {
   }
 
 
-  const registerUser = useCallback(async (data) => {
+  const registerUser = async (data) => {
     try {
-      const uid = route.params.uid;
+      const {uid, phone} = route.params;
+      console.log(phone);
       setLoader(true);
       if (data.isDoctor) {
         console.log(fileResponse)
-        database().ref(`/users/doctor/${uid}`).set(data);
+        database().ref(`/users/doctor/${uid}/info`).set({...data, phone});
         await storage()
           .ref(`/users/doctor/${data.name}::${uid}/certificate`)
           .putFile(fileResponse.fileCopyUri);
       } else {
-        await database().ref(`/users/general/${uid}`).set(data);
+        await database().ref(`/users/general/${uid}/info`).set({...data, phone});
       }
-      await storeUser ({uid, ...data});
-      // const uid = await AsyncStorage.getItem("uid");
-      // console.log(uid)
-      // navigation.reset({ index: 0, routes: [{ name: "Root" }] });
+      await storeUser ({uid, ...data, phone});
       setIsSignedIn(true);
     } catch (e) {
       console.error(e);
     } finally {
       setLoader(false);
     }
-  }, []);
+  };
 
   return (
     <>

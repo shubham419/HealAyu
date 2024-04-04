@@ -51,7 +51,7 @@ const RootComponent = () => {
           </Stack.Navigator>
         )}
       </Tab.Screen>
-      <Tab.Screen
+      {/* <Tab.Screen
         name="SOS"
         component={AppointmentDetailScreen}
         options={{
@@ -59,16 +59,32 @@ const RootComponent = () => {
             <MaterialCommunityIcons name="bike-fast" size={24} color={color} />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="Search Doctor"
-        component={SearchScreen}
         options={{
           tabBarIcon: ({ color }) => (
             <Ionicons name="search-outline" size={24} color={color} />
           ),
         }}
-      />
+      >
+        {
+          () => (
+            <Stack.Navigator>
+              <Stack.Screen
+              name="SearchScreen"
+              component={SearchScreen}
+              options={{ headerShown: false }}
+              />
+              <Stack.Screen
+              name="DoctorDetailScreen"
+              component={DoctorDetailScreen}
+              options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
+          )
+        }
+      </Tab.Screen>
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}

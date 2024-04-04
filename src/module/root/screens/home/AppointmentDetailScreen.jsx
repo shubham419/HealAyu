@@ -6,23 +6,33 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  PermissionsAndroid,
+  Platform,
 } from "react-native";
 import Colors from "../../../../theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 import storage from "@react-native-firebase/storage";
+import database from "@react-native-firebase/database";
 import AuthContext from "../../../../utils/AuthContext";
 import DocumentPicker from "react-native-document-picker";
 import Toast from "react-native-root-toast";
 
+import * as MediaLibrary from "expo-media-library";
+import * as FileSystem from "expo-file-system";
+import { ActivityIndicator } from "react-native-paper";
+
 const AppointmentDetailScreen = ({ route }) => {
   const data = route.params.data;
+  console.log(data);
   const doc = DocumentPicker;
   const [fileResponse, setFileResponse] = useState(null);
+  const [loader, setLoader] = useState(false);
 
   const handleDocumentSelection = async () => {
     try {
       const response = await doc.pickSingle({
-        presentationStyle: "fullScreen",
+        presentationStyle: "formSheet",
+        type: [DocumentPicker.types.images],
         allowMultiSelection: false,
         copyTo: "documentDirectory",
       });
@@ -39,81 +49,142 @@ const AppointmentDetailScreen = ({ route }) => {
   };
 
   const { userData } = useContext(AuthContext);
-  console.log(userData);
+  console.log("AppointmentDetailScreen ~ userData:-", userData);
 
   useEffect(() => {
     const upload = async () => {
       try {
-        console.log("called");
+        setLoader(true);
         let location = "location";
         if (userData.isDoctor) {
-          location = `/users/doctor/${userData.uid}/appointment/ID/prescription`;
-        } else location = `/users/general/${userData.uid}/appointment/ID/report`;
+          location = `/users/doctor/${userData.name}::${userData.uid}/appointment/${data.id}/file`;
+        } else {
+          location = `/users/general/${userData.name}::${userData.uid}/appointment/${data.id}/file`;
+        }
+        await database()
+          .ref(`${data.metadata}`)
+          .update({ fileLocation: location });
+        
         await storage().ref(`${location}`).putFile(fileResponse.fileCopyUri);
-        console.log(location);
+        Toast.show("document uploaded successfully", {
+          duration: Toast.durations.SHORT,
+        });
       } catch (error) {
         console.log("error ==>", error);
+      } finally {
+        setLoader(false);
       }
     };
 
     if (fileResponse) {
-      console.log("hii");
       upload();
     }
   }, [fileResponse]);
+  
 
+  const downloadDocument = async () => {
+    try {
+      setLoader(true);
+      if(!data.fileLocation){
+        Toast.show("no file existed to download, please contact team", {
+          duration: Toast.durations.LONG,
+        });
+        return;
+      }
+      const downloadUrl = await storage()
+        .ref(data.fileLocation)
+        .getDownloadURL();
+
+      if (Platform.OS === "android") {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+          Toast.show("Permission denied", { duration: Toast.durations.LONG });
+          console.log("Permission denied");
+          return;
+        }
+      }
+
+      const fileUri = FileSystem.documentDirectory + "example_file.png";
+      const { uri } = await FileSystem.downloadAsync(downloadUrl, fileUri);
+
+      const asset = await MediaLibrary.createAssetAsync(uri);
+
+      await MediaLibrary.createAlbumAsync("Download", asset, false);
+      Toast.show("File downloaded, Please check in gallery", {
+        duration: Toast.durations.LONG,
+      });
+    } catch (error) {
+      Toast.show("Error downloading file, please contact team", {
+        duration: Toast.durations.LONG,
+      });
+      console.error("Error downloading file:", error);
+    } finally {
+      setLoader(false);
+    }
+  };
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.detailContainer}>
-          <Text style={styles.label}>Date</Text>
-          <Text style={styles.value}>{data.date}</Text>
+    <>
+      {loader ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={Colors.main} />
+          <Text>Please Wait...</Text>
         </View>
-        <View style={styles.detailContainer}>
-          <Text style={styles.label}>Time</Text>
-          <Text style={styles.value}>{data.time}</Text>
-        </View>
-        <View style={styles.detailContainer}>
-          <Text style={styles.label}>Status</Text>
-          <Text style={[styles.value, styles.completed]}>{data.status}</Text>
-        </View>
-        <View style={styles.detailContainer}>
-          <Text style={styles.label}>Doctor</Text>
-          <Text style={styles.value}>{data.doctorName}</Text>
-        </View>
-      </View>
-      <View style={styles.actionButton}>
-        <TouchableOpacity
-          style={styles.actionButtonContent}
-          activeOpacity={0.8}
-          onPress={handleDocumentSelection}
-        >
-          <View style={styles.buttonContent}>
-            <Ionicons
-              name="cloud-upload-outline"
-              size={24}
-              color={Colors.white}
-            />
-            <Text style={styles.actionButtonText}>Upload Reports</Text>
+      ) : null}
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.card}>
+          <View style={styles.detailContainer}>
+            <Text style={styles.label}>Date</Text>
+            <Text style={styles.value}>{data.date}</Text>
           </View>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.actionButton}>
-        <TouchableOpacity
-          style={styles.actionButtonContent}
-          activeOpacity={0.8}
-        >
-          <View style={styles.buttonContent}>
-            <Ionicons
-              name="cloud-download-outline"
-              size={24}
-              color={Colors.white}
-            />
-            <Text style={styles.actionButtonText}>Download Prescription</Text>
+          <View style={styles.detailContainer}>
+            <Text style={styles.label}>Time</Text>
+            <Text style={styles.value}>{data.time}</Text>
           </View>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          <View style={styles.detailContainer}>
+            <Text style={styles.label}>Status</Text>
+            <Text style={[styles.value, styles.completed]}>{data.status}</Text>
+          </View>
+          <View style={styles.detailContainer}>
+            <Text style={styles.label}>Doctor</Text>
+            <Text style={styles.value}>{data.doctorName}</Text>
+          </View>
+        </View>
+        <View style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButtonContent}
+            activeOpacity={0.8}
+            onPress={handleDocumentSelection}
+          >
+            <View style={styles.buttonContent}>
+              <Ionicons
+                name="cloud-upload-outline"
+                size={24}
+                color={Colors.white}
+              />
+              <Text style={styles.actionButtonText}>Upload Reports</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.actionButton}>
+          <TouchableOpacity
+            style={styles.actionButtonContent}
+            activeOpacity={0.8}
+            onPress={downloadDocument}
+          >
+            <View style={styles.buttonContent}>
+              <Ionicons
+                name="cloud-download-outline"
+                size={24}
+                color={Colors.white}
+              />
+              <Text style={styles.actionButtonText}>Download Prescription</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </>
   );
 };
 
@@ -179,5 +250,15 @@ const styles = StyleSheet.create({
   buttonContent: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  loaderContainer: {
+    position: "absolute",
+    flex: 1,
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
+    backgroundColor: "rgba(207, 190, 199, 0.75)",
   },
 });

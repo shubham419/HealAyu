@@ -15,19 +15,40 @@ import { Portal } from "react-native-paper";
 import Colors from "../../../../theme/colors";
 import BookAppointmentModal from "./BookAppointmentModal";
 
-const DoctorDetailScreen = () => {
+const DoctorDetailScreen = ({ route }) => {
   const [visible, setVisible] = React.useState(false);
   const { userData } = useContext(AuthContext);
-
+  const doctorData = route.params.data;
+  console.log(doctorData);
   const bookAppontment = async (date, time) => {
     try {
-      await database()
+      const appointmentID = database()
         .ref(`/users/general/${userData.uid}/appointments`)
-        .push()
-        .update({ date, time, status: "pending", doctorName:"test"});
-      setVisible(false);
+        .push();
+
+      const key = appointmentID.key;
+      await appointmentID.set({
+        date,
+        time,
+        status: "pending",
+        doctorName: `${doctorData.name} ${doctorData.lastName}`,
+        metadata: `/users/doctor/${doctorData.id}/appointments/${key}`,
+      });
+
+      // appointment that will be visible to doctor
+      await database()
+        .ref(`/users/doctor/${doctorData.id}/appointments/${key}`)
+        .set({
+          date,
+          time,
+          status: "pending",
+          name: `${userData.name} ${userData.lastName}`,
+          metadata: `/users/general/${userData.uid}/appointments/${key}`
+        });
     } catch (e) {
       console.log(e);
+    } finally {
+      setVisible(false);
     }
   };
 
@@ -48,7 +69,7 @@ const DoctorDetailScreen = () => {
       </View>
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>Shubham Thorat</Text>
+        <Text style={styles.value}>{`${doctorData.name} ${doctorData.lastName}`}</Text>
         <Text style={styles.label}>Specialist:</Text>
         <Text style={styles.value}>Neurosurgeon</Text>
         <Text style={styles.label}>Bio:</Text>

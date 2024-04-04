@@ -8,20 +8,16 @@ import DoctorCard from "./DoctorCard";
 const DoctorList = () => {
   const [docList, serDocList] = useState([]);
 
-  console.log(docList);
-
   useEffect(() => {
     async function getData() {
-      console.log("data");
       const snapShot = await database().ref("users/doctor").once("value");
       const temp = [];
 
       if (snapShot.exists()) {
         snapShot.forEach((item) => {
           if (item) {
-            temp.push(item.val());
+            temp.push({...item.val().info, id: item.key});
           }
-          console.log(item.val());
         });
       }
       serDocList(temp);

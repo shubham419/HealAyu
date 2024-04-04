@@ -18,20 +18,37 @@ const AppointmentList = () => {
     async function getData() {
       try {
         const snapShot = await database()
-          .ref(`users/general/${userData.uid}/appointments`)
+          .ref(`users/${userData.isDoctor ? "doctor" : "general"}/${userData.uid}/appointments`)
           .once("value");
+        // console.log(snapShot);
         const pastTemp = [];
         const upcommingTemp = [];
         if (snapShot.exists()) {
+
+          // console.log(snapShot.child);
+          // console.log("snapshot", snapShot);
+          // console.log("key", snapShot.key);
+
+          // for (const key in snapShot.child) {
+          //   console.log(key);
+          //   const item = snapShot[key];
+          //   if (item.status === "pending") {
+          //     pastTemp.push({ ...item, id: key });
+          //   }else {
+          //     upcommingTemp.push({...item, id: key});
+          //   }
+          // }
+
           snapShot.forEach((item) => {
             if (item) {
-              if (item.val().status !== "pending") {
-                pastTemp.push(item.val());
+              if (item.val().status == "completed") {
+                pastTemp.push({...item.val(), id:item.key});
               } else {
-                upcommingTemp.push(item.val());
+                upcommingTemp.push({...item.val(), id:item.key});
               }
             }
-          });
+          }
+          );
         }
         setUpcommingList(upcommingTemp);
         setPastList(pastTemp);

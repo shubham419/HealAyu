@@ -13,12 +13,11 @@ import AuthContext from "../../../utils/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { storeUser } from "../../../utils/asyncStorage";
 
-
 const OtpScreen = ({ route }) => {
   const confirmation = route.params.confirmation;
   const navigation = useNavigation();
   const [laoder, setLoader] = useState(false);
-  const {setIsSignedIn} = useContext(AuthContext);
+  const { setIsSignedIn } = useContext(AuthContext);
 
   const confirmCode = async (code) => {
     try {
@@ -27,23 +26,38 @@ const OtpScreen = ({ route }) => {
       const user = userCredential.user;
 
       const existedGeneralUser = await database()
-        .ref(`/users/general/${user.uid}`)
+        .ref(`/users/general/${user.uid}/info`)
         .once("value");
 
       const existedDoctorUser = await database()
         .ref(`/users/doctor/${user.uid}`)
         .once("value");
-      console.log(existedDoctorUser,"existedGeneralUser ==>" ,existedGeneralUser);
-      if(existedDoctorUser.exists()){
-        await storeUser({uid : user.uid, isDoctor: true });
+      // console.log(existedDoctorUser,"existedGeneralUser ==>" ,existedGeneralUser);
+
+      if (existedDoctorUser.exists()) {
+        console.log(existedDoctorUser.val().email);
+        await storeUser({
+          uid: user.uid,
+          isDoctor: true,
+          email: existedDoctorUser.val().email,
+          name: existedDoctorUser.val().name,
+          lastName: existedDoctorUser.val().lastName,
+          phone: existedDoctorUser.val().phone,
+        });
         setIsSignedIn(true);
-      }
-      if (existedGeneralUser.exists()) {
-        await storeUser({uid : user.uid, isDoctor: false });
+      } else if (existedGeneralUser.exists()) {
+        await storeUser({
+          uid: user.uid,
+          isDoctor: false,
+          email: existedGeneralUser.val().email,
+          name: existedGeneralUser.val().name,
+          lastName: existedGeneralUser.val().lastName,
+          phone: existedGeneralUser.val().phone,
+        });
         setIsSignedIn(true);
       } else {
         navigation.pop();
-        navigation.navigate("RegisterScreen", { uid: [user.uid] });
+        navigation.navigate("RegisterScreen", { uid: user.uid, phone: route.params.phoneNumber });
       }
     } catch (e) {
       Toast.show("code is invalid", {
