@@ -1,5 +1,9 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
+import React, { useEffect, useState, useContext } from "react";
 import database from "@react-native-firebase/database";
 import { ActivityIndicator } from "react-native-paper";
 import Colors from "../../../../theme/colors";
@@ -7,6 +11,8 @@ import DoctorCard from "./DoctorCard";
 
 const DoctorList = () => {
   const [docList, serDocList] = useState([]);
+  const [loader, setLoader] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -16,20 +22,32 @@ const DoctorList = () => {
       if (snapShot.exists()) {
         snapShot.forEach((item) => {
           if (item) {
-            temp.push({...item.val().info, id: item.key});
+            temp.push({ ...item.val().info, id: item.key });
           }
         });
       }
       serDocList(temp);
-      console.log(Array.from(snapShot.val()));
     }
     getData();
+  }, [loader]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setLoader((prv) => !prv);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {docList.length ? (
-        docList.map((data) => <DoctorCard data={data} />)
+        docList.map((data) => <DoctorCard key={data.id} data={data} />)
       ) : (
         <ActivityIndicator animating={true} color={Colors.main} size={40} />
       )}
@@ -40,5 +58,7 @@ const DoctorList = () => {
 export default DoctorList;
 
 const styles = StyleSheet.create({
-  container: {},
+  container: {
+    height: "100%",
+  },
 });

@@ -1,8 +1,5 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import AuthNavigation from "./src/module/auth/navigation/AuthNavigation";
 import RootComponent from "./src/module/root/navigation/RootComponent";
 import { RootSiblingParent } from "react-native-root-siblings";
 import { useEffect, useRef, useState } from "react";
@@ -10,7 +7,6 @@ import PhoneNumberScreen from "./src/module/auth/screens/PhoneNumberScreen";
 import UserTypeScreen from "./src/module/auth/screens/UserTypeScreen";
 import OtpScreen from "./src/module/auth/screens/OtpScreen";
 import RegisterScreen from "./src/module/auth/screens/RegisterScreen";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import AuthContext from "./src/utils/AuthContext";
 import { PaperProvider } from "react-native-paper";
@@ -22,10 +18,8 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   const [isSignedIn, setIsSignedIn] = useState(true);
   const [userData, setUserData] = useState({});
-  // const { setUser } = useAuth();
+  const [reload, setReload] = useState(0);
 
-
-  
   useEffect(() => {
     getUserData();
     async function getUserData() {
@@ -36,7 +30,7 @@ export default function App() {
           setUserData(userData);
           setIsSignedIn(true);
         } else {
-          console.log("not uid present")
+          console.log("not uid present");
           setUserData({});
           setIsSignedIn(false);
         }
@@ -51,7 +45,9 @@ export default function App() {
   return (
     <PaperProvider>
       <RootSiblingParent>
-        <AuthContext.Provider value={{setIsSignedIn, userData}}>
+        <AuthContext.Provider
+          value={{ setIsSignedIn, userData, reload, setReload }}
+        >
           <NavigationContainer>
             <Stack.Navigator
               screenOptions={{

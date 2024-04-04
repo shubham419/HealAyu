@@ -3,52 +3,38 @@ import React, { useState, useContext, useEffect } from "react";
 import database from "@react-native-firebase/database";
 import AuthContext from "../../../utils/AuthContext";
 import ListView from "./ListView";
-import {
-  TabsProvider,
-  Tabs,
-  TabScreen,
-} from "react-native-paper-tabs";
+import { TabsProvider, Tabs, TabScreen } from "react-native-paper-tabs";
 
 const AppointmentList = () => {
   const [upcommingList, setUpcommingList] = useState([]);
   const [pastList, setPastList] = useState([]);
-  const { userData } = useContext(AuthContext);
+  const { userData, reload } = useContext(AuthContext);
 
   useEffect(() => {
     async function getData() {
       try {
         const snapShot = await database()
-          .ref(`users/${userData.isDoctor ? "doctor" : "general"}/${userData.uid}/appointments`)
+          .ref(
+            `users/${userData.isDoctor ? "doctor" : "general"}/${
+              userData.uid
+            }/appointments`
+          )
           .once("value");
         // console.log(snapShot);
         const pastTemp = [];
         const upcommingTemp = [];
         if (snapShot.exists()) {
-
-          // console.log(snapShot.child);
-          // console.log("snapshot", snapShot);
-          // console.log("key", snapShot.key);
-
-          // for (const key in snapShot.child) {
-          //   console.log(key);
-          //   const item = snapShot[key];
-          //   if (item.status === "pending") {
-          //     pastTemp.push({ ...item, id: key });
-          //   }else {
-          //     upcommingTemp.push({...item, id: key});
-          //   }
-          // }
-
+          const today = new Date();
           snapShot.forEach((item) => {
             if (item) {
-              if (item.val().status == "completed") {
-                pastTemp.push({...item.val(), id:item.key});
+              const appointmentDate = new Date(item.val().date);
+              if (appointmentDate < today) {
+                pastTemp.push({ ...item.val(), id: item.key });
               } else {
-                upcommingTemp.push({...item.val(), id:item.key});
+                upcommingTemp.push({ ...item.val(), id: item.key });
               }
             }
-          }
-          );
+          });
         }
         setUpcommingList(upcommingTemp);
         setPastList(pastTemp);
@@ -57,7 +43,7 @@ const AppointmentList = () => {
       }
     }
     if (userData.uid) getData();
-  }, [userData]);
+  }, [userData, reload]);
 
   return (
     <View style={styles.container}>
@@ -66,7 +52,6 @@ const AppointmentList = () => {
           <TabScreen label="Upcoming">
             <ListView data={upcommingList} />
           </TabScreen>
-
           <TabScreen label="Past">
             <ListView data={pastList} />
           </TabScreen>

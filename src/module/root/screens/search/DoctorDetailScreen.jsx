@@ -5,21 +5,20 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import React, { useContext, useEffect } from "react";
-import { ActivityIndicator, Avatar } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
-import ReviewView from "./ReviewView";
+import React, { useContext } from "react";
+import { Avatar } from "react-native-paper";
 import AuthContext from "../../../../utils/AuthContext";
 import database from "@react-native-firebase/database";
 import { Portal } from "react-native-paper";
-import Colors from "../../../../theme/colors";
 import BookAppointmentModal from "./BookAppointmentModal";
+import ReadOnlyRating from "./ReadOnlyRating";
+import Toast from "react-native-root-toast";
 
 const DoctorDetailScreen = ({ route }) => {
   const [visible, setVisible] = React.useState(false);
-  const { userData } = useContext(AuthContext);
+  const { userData, setReload } = useContext(AuthContext);
   const doctorData = route.params.data;
-  console.log(doctorData);
+  
   const bookAppontment = async (date, time) => {
     try {
       const appointmentID = database()
@@ -43,8 +42,10 @@ const DoctorDetailScreen = ({ route }) => {
           time,
           status: "pending",
           name: `${userData.name} ${userData.lastName}`,
-          metadata: `/users/general/${userData.uid}/appointments/${key}`
+          metadata: `/users/general/${userData.uid}/appointments/${key}`,
         });
+        setReload((prv) => prv + 1)
+        Toast.show("appointment booked", {duration: Toast.durations.LONG})
     } catch (e) {
       console.log(e);
     } finally {
@@ -69,7 +70,9 @@ const DoctorDetailScreen = ({ route }) => {
       </View>
       <View style={styles.infoContainer}>
         <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>{`${doctorData.name} ${doctorData.lastName}`}</Text>
+        <Text
+          style={styles.value}
+        >{`${doctorData.name} ${doctorData.lastName}`}</Text>
         <Text style={styles.label}>Specialist:</Text>
         <Text style={styles.value}>Neurosurgeon</Text>
         <Text style={styles.label}>Bio:</Text>
@@ -80,20 +83,8 @@ const DoctorDetailScreen = ({ route }) => {
           officiis optio. Ad, illum modi.
         </Text>
         <Text style={styles.label}>Rating:</Text>
-        <View style={styles.ratingContainer}>
-          <Ionicons name="star" size={20} color="#FFD700" />
-          <Ionicons name="star" size={20} color="#FFD700" />
-          <Ionicons name="star" size={20} color="#FFD700" />
-          <Ionicons name="star-half" size={20} color="#FFD700" />
-          <Ionicons name="star-outline" size={20} color="#FFD700" />
-          <Text style={styles.ratingText}>(3.5)</Text>
-        </View>
-        <Text style={styles.label}>Review:</Text>
-        <View style={styles.reviewContainer}>
-          <ReviewView
-            rating={3.5}
-            text="Great doctor, very knowledgeable and friendly."
-          />
+        <View>
+          <ReadOnlyRating rating={doctorData.rating} />
         </View>
         <TouchableOpacity
           onPress={() => setVisible(true)}
@@ -161,6 +152,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 5,
     alignItems: "center",
+    marginTop: 20,
   },
   buttonText: {
     fontSize: 18,

@@ -20,6 +20,8 @@ import Toast from "react-native-root-toast";
 import * as MediaLibrary from "expo-media-library";
 import * as FileSystem from "expo-file-system";
 import { ActivityIndicator } from "react-native-paper";
+import CustomButton from "../../../../core/components/CustomButton";
+import { useNavigation } from "@react-navigation/native";
 
 const AppointmentDetailScreen = ({ route }) => {
   const data = route.params.data;
@@ -27,6 +29,7 @@ const AppointmentDetailScreen = ({ route }) => {
   const doc = DocumentPicker;
   const [fileResponse, setFileResponse] = useState(null);
   const [loader, setLoader] = useState(false);
+  const navigation = useNavigation();
 
   const handleDocumentSelection = async () => {
     try {
@@ -48,7 +51,7 @@ const AppointmentDetailScreen = ({ route }) => {
     }
   };
 
-  const { userData } = useContext(AuthContext);
+  const { userData, setReload } = useContext(AuthContext);
   console.log("AppointmentDetailScreen ~ userData:-", userData);
 
   useEffect(() => {
@@ -64,7 +67,7 @@ const AppointmentDetailScreen = ({ route }) => {
         await database()
           .ref(`${data.metadata}`)
           .update({ fileLocation: location });
-        
+
         await storage().ref(`${location}`).putFile(fileResponse.fileCopyUri);
         Toast.show("document uploaded successfully", {
           duration: Toast.durations.SHORT,
@@ -80,12 +83,11 @@ const AppointmentDetailScreen = ({ route }) => {
       upload();
     }
   }, [fileResponse]);
-  
 
   const downloadDocument = async () => {
     try {
       setLoader(true);
-      if(!data.fileLocation){
+      if (!data.fileLocation) {
         Toast.show("no file existed to download, please contact team", {
           duration: Toast.durations.LONG,
         });
@@ -124,6 +126,26 @@ const AppointmentDetailScreen = ({ route }) => {
       setLoader(false);
     }
   };
+
+  const cahngeStatus = async () => {
+    try {
+      setLoader(true);
+      await database().ref(data.metadata).update({ status: "confirmed" });
+      await database()
+        .ref(`/users/doctor/${userData.uid}/appointments/${data.id}`)
+        .update({ status: "confirmed" });
+      Toast.show("appointment confirmed successfully", {
+        duration: Toast.durations.SHORT,
+      });
+      setReload(prv => prv + 1);
+      navigation.goBack();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoader(false);
+    }
+  };
+
   return (
     <>
       {loader ? (
@@ -146,43 +168,69 @@ const AppointmentDetailScreen = ({ route }) => {
             <Text style={styles.label}>Status</Text>
             <Text style={[styles.value, styles.completed]}>{data.status}</Text>
           </View>
-          <View style={styles.detailContainer}>
-            <Text style={styles.label}>Doctor</Text>
-            <Text style={styles.value}>{data.doctorName}</Text>
-          </View>
-        </View>
-        <View style={styles.actionButton}>
-          <TouchableOpacity
-            style={styles.actionButtonContent}
-            activeOpacity={0.8}
-            onPress={handleDocumentSelection}
-          >
-            <View style={styles.buttonContent}>
-              <Ionicons
-                name="cloud-upload-outline"
-                size={24}
-                color={Colors.white}
-              />
-              <Text style={styles.actionButtonText}>Upload Reports</Text>
+          {data.doctorName ? (
+            <View style={styles.detailContainer}>
+              <Text style={styles.label}>Doctor</Text>
+              <Text style={styles.value}>{data.doctorName}</Text>
             </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.actionButton}>
-          <TouchableOpacity
-            style={styles.actionButtonContent}
-            activeOpacity={0.8}
-            onPress={downloadDocument}
-          >
-            <View style={styles.buttonContent}>
-              <Ionicons
-                name="cloud-download-outline"
-                size={24}
-                color={Colors.white}
-              />
-              <Text style={styles.actionButtonText}>Download Prescription</Text>
+          ) : null}
+          {data.name ? (
+            <View style={styles.detailContainer}>
+              <Text style={styles.label}>Name</Text>
+              <Text style={styles.value}>{data.name}</Text>
             </View>
-          </TouchableOpacity>
+          ) : null}
         </View>
+        {userData.isDoctor && data.status == "pending" ? (
+          <>
+            <CustomButton
+              title="Confirm Appointment"
+              handler={cahngeStatus}
+            ></CustomButton>
+          </>
+        ) : null}
+        {data.status !== "pending" ? (
+          <>
+            <View style={styles.actionButton}>
+              <TouchableOpacity
+                style={styles.actionButtonContent}
+                activeOpacity={0.8}
+                onPress={handleDocumentSelection}
+              >
+                <View style={styles.buttonContent}>
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={24}
+                    color={Colors.white}
+                  />
+                  <Text style={styles.actionButtonText}>Upload Reports</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.actionButton}>
+              <TouchableOpacity
+                style={styles.actionButtonContent}
+                activeOpacity={0.8}
+                onPress={downloadDocument}
+              >
+                <View style={styles.buttonContent}>
+                  <Ionicons
+                    name="cloud-download-outline"
+                    size={24}
+                    color={Colors.white}
+                  />
+                  <Text style={styles.actionButtonText}>
+                    Download Prescription
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <Text>
+              *appointment has been confirmed. please check email for further
+              information
+            </Text>
+          </>
+        ) : null}
       </ScrollView>
     </>
   );

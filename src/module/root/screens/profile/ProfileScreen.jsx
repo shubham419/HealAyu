@@ -8,23 +8,24 @@ const ProfileScreen = () => {
 
   const { setIsSignedIn } = useContext(AuthContext);
 
+  const {userData} = useContext(AuthContext);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <MaterialIcons name="person" size={60} color="black" />
-        <Text style={styles.name}>Shubham Thorat</Text>
-        <Text style={styles.phoneNumber}>9325290728</Text>
+        <MaterialIcons name="person" size={120} color="black" />
+        <Text style={styles.name}>{`${userData.name} ${userData.lastName}`}</Text>
+        <Text style={styles.phoneNumber}>{userData.phone}</Text>
       </View>
       <View style={styles.section}>
         <MaterialIcons name="email" size={24} color="black" />
-        <Text style={styles.value}>shubham@example.com</Text>
+        <Text style={styles.value}>{userData.email}</Text>
       </View>
       <TouchableOpacity style={styles.logoutButton} onPress={ () => {
          AsyncStorage.removeItem("user");
          setIsSignedIn(false);
       }}>
-        <MaterialIcons name="logout" size={24} color="white" />
+        <MaterialIcons name="logout" size={24} />
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -67,7 +68,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutText: {
-    color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
     marginLeft: 10,

@@ -18,17 +18,17 @@ const CustomButton = ({ handler, title }) => {
 export default CustomButton;
 
 const styles = StyleSheet.create({
-      appButtonContainer: {
-        elevation: 8,
-        backgroundColor: Colors.main,
-        borderRadius: 4,
-        padding:8,
-        margin:20,
-        width:"90%"
-      },
-      appButtonText: {
-        fontSize: 18,
-        color: "#fff",
-        alignSelf: "center",
-      }
+  appButtonContainer: {
+    elevation: 8,
+    backgroundColor: Colors.main,
+    borderRadius: 4,
+    padding: 8,
+    margin: 20,
+    width: "90%",
+  },
+  appButtonText: {
+    fontSize: 18,
+    color: "#fff",
+    alignSelf: "center",
+  },
 });

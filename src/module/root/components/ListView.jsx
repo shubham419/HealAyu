@@ -1,24 +1,33 @@
-import { StyleSheet, Text, ScrollView, View } from "react-native";
-import React from "react";
+import { StyleSheet, Text, ScrollView, View, RefreshControl } from "react-native";
+import React, { useContext, useState } from "react";
 import AppointmentCard from "./AppointmentCard";
 import { ActivityIndicator } from "react-native-paper";
 import Colors from "../../../theme/colors";
+import AuthContext from "../../../utils/AuthContext";
 
-const ListView = ({data}) => {
-  // const data = {
-  //     doctorName: "Shubham Thorat",
-  //     specialist: "Neurosurgeon",
-  //     time: "6:00 PM",
-  //     date: "26th Feb",
-  //     status: "Confirmed",
-  //   };
-  // const data = [];
+const ListView = ({ data }) => {
+
+  const [refreshing, setRefreshing] = useState(false);
+  const {setReload} = useContext(AuthContext);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setReload((prv => prv + 1))
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1500);
+  }, []);
+
   return (
     <>
       {data.length ? (
-        <ScrollView>
-          {data.map((data, idx) => {
-            return <AppointmentCard key={idx} data={data} />;
+        <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        >
+          {data.map((data) => {
+            return <AppointmentCard key={data.id} data={data} />;
           })}
         </ScrollView>
       ) : (

@@ -30,9 +30,9 @@ const OtpScreen = ({ route }) => {
         .once("value");
 
       const existedDoctorUser = await database()
-        .ref(`/users/doctor/${user.uid}`)
+        .ref(`/users/doctor/${user.uid}/info`)
         .once("value");
-      // console.log(existedDoctorUser,"existedGeneralUser ==>" ,existedGeneralUser);
+      console.log(existedDoctorUser,"existedGeneralUser ==>" ,existedGeneralUser);
 
       if (existedDoctorUser.exists()) {
         console.log(existedDoctorUser.val().email);
