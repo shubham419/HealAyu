@@ -21,7 +21,7 @@ const DoctorCard = ({ data }) => {
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Specialist:</Text>
-            <Text style={styles.value}>{data.specialist}</Text>
+            <Text style={styles.value}>{data.specialization}</Text>
           </View>
           <View style={styles.row}>
             <Text style={styles.label}>Experience:</Text>

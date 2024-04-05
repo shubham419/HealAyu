@@ -27,7 +27,7 @@ const RootComponent = () => {
       shifting={true}
     >
       <Tab.Screen
-        name="Home"
+        name="HomeBottomBar"
         // component={HomeScreen}
         options={{
           tabBarLabel: "Home",
@@ -51,15 +51,6 @@ const RootComponent = () => {
           </Stack.Navigator>
         )}
       </Tab.Screen>
-      {/* <Tab.Screen
-        name="SOS"
-        component={AppointmentDetailScreen}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="bike-fast" size={24} color={color} />
-          ),
-        }}
-      /> */}
       <Tab.Screen
         name="Search Doctor"
         options={{

@@ -32,10 +32,9 @@ const OtpScreen = ({ route }) => {
       const existedDoctorUser = await database()
         .ref(`/users/doctor/${user.uid}/info`)
         .once("value");
-      console.log(existedDoctorUser,"existedGeneralUser ==>" ,existedGeneralUser);
+      // console.log(existedDoctorUser,"existedGeneralUser ==>" ,existedGeneralUser);
 
       if (existedDoctorUser.exists()) {
-        console.log(existedDoctorUser.val().email);
         await storeUser({
           uid: user.uid,
           isDoctor: true,
@@ -57,7 +56,10 @@ const OtpScreen = ({ route }) => {
         setIsSignedIn(true);
       } else {
         navigation.pop();
-        navigation.navigate("RegisterScreen", { uid: user.uid, phone: route.params.phoneNumber });
+        navigation.navigate("RegisterScreen", {
+          uid: user.uid,
+          phone: route.params.phoneNumber,
+        });
       }
     } catch (e) {
       Toast.show("code is invalid", {

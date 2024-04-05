@@ -2,10 +2,10 @@ import React, { useState, useCallback, useContext } from "react";
 import {
   StyleSheet,
   Text,
-  TextInput,
   View,
   TouchableOpacity,
   ActivityIndicator,
+  ScrollView,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import CheckBox from "react-native-check-box";
@@ -21,17 +21,19 @@ import CustomButton from "../../../core/components/CustomButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AuthContext from "../../../utils/AuthContext";
 import { storeUser } from "../../../utils/asyncStorage";
+import { TextInput } from "react-native-paper";
 
 const RegisterScreen = ({ route }) => {
   const [userData, setUserData] = useState({
-    name: "",
-    lastName: "",
-    email: "",
+    name: null,
+    lastName: null,
+    email: null,
     isDoctor: false,
+    experience: null,
+    specialization: null,
   });
   const [fileResponse, setFileResponse] = useState(null);
   const [loader, setLoader] = useState(false);
-  const navigation = useNavigation();
   const { setIsSignedIn } = useContext(AuthContext);
   const doc = DocumentPicker;
 
@@ -50,9 +52,15 @@ const RegisterScreen = ({ route }) => {
   };
 
   const handleProceed = () => {
-    const { name, lastName, email } = userData;
+    const { name, lastName, email, experience, specialization } = userData;
     if (name && lastName && email) {
-      registerUser(userData);
+      if (userData.isDoctor && (!experience || !specialization || !fileResponse)) {
+        Toast.show("Please fill in all the details to proceed", {
+          duration: Toast.durations.SHORT,
+        });
+      } else {
+        registerUser(userData);
+      }
     } else {
       Toast.show("Please fill in all the details to proceed", {
         duration: Toast.durations.SHORT,
@@ -78,24 +86,25 @@ const RegisterScreen = ({ route }) => {
     } catch (err) {
       console.warn(err);
     }
-  }
-
+  };
 
   const registerUser = async (data) => {
     try {
-      const {uid, phone} = route.params;
-      console.log(phone);
+      const { uid, phone } = route.params;
       setLoader(true);
       if (data.isDoctor) {
-        console.log(fileResponse)
-        database().ref(`/users/doctor/${uid}/info`).set({...data, phone});
+        database()
+          .ref(`/users/doctor/${uid}/info`)
+          .set({ ...data, phone, rating: 4 });
         await storage()
           .ref(`/users/doctor/${data.name}::${uid}/certificate`)
           .putFile(fileResponse.fileCopyUri);
       } else {
-        await database().ref(`/users/general/${uid}/info`).set({...data, phone});
+        await database()
+          .ref(`/users/general/${uid}/info`)
+          .set({ ...data, phone });
       }
-      await storeUser ({uid, ...data, phone});
+      await storeUser({ uid, ...data, phone });
       setIsSignedIn(true);
     } catch (e) {
       console.error(e);
@@ -113,59 +122,79 @@ const RegisterScreen = ({ route }) => {
           color={Colors.white}
         />
       </AuthHeader>
-      <View style={styles.container}>
-        <View style={styles.form}>
-          <Text style={styles.heading}>Setup your profile</Text>
-          <Text style={styles.subHeading}>We kept it quick and simple</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter Your Email"
-            value={userData.email}
-            onChangeText={(text) => handleInputChange("email", text)}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="First Name"
-            value={userData.name}
-            onChangeText={(text) => handleInputChange("name", text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Last Name"
-            value={userData.lastName}
-            onChangeText={(text) => handleInputChange("lastName", text)}
-          />
-          <TouchableOpacity onPress={toggleCreateDoctorAccount}>
-            <View style={styles.checkboxContainer}>
-              <CheckBox
-                isChecked={userData.isDoctor}
-                onClick={toggleCreateDoctorAccount}
-              />
-              <Text style={styles.checkboxLabel}>I am Doctor</Text>
-            </View>
-          </TouchableOpacity>
-          {userData.isDoctor && (
-            <>
-              <TouchableOpacity onPress={handleDocumentSelection}>
-                <Entypo name="upload" size={24} color="black" />
-                <Text>Please upload your degree certificate</Text>
-              </TouchableOpacity>
-              <Text numberOfLines={1} ellipsizeMode="middle">
-                {fileResponse?.uri}
-              </Text>
-            </>
-          )}
-        </View>
-        {loader && (
-          <View style={styles.loaderContainer}>
-            <ActivityIndicator size="large" color={Colors.main} />
-            <Text>Please Wait...</Text>
+      <ScrollView>
+        <View style={styles.container}>
+          <View style={styles.form}>
+            <Text style={styles.heading}>Setup your profile</Text>
+            <Text style={styles.subHeading}>We kept it quick and simple</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="enter your email"
+              label="Email"
+              value={userData.email}
+              onChangeText={(text) => handleInputChange("email", text)}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              value={userData.name}
+              onChangeText={(text) => handleInputChange("name", text)}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              value={userData.lastName}
+              onChangeText={(text) => handleInputChange("lastName", text)}
+            />
+            <TouchableOpacity onPress={toggleCreateDoctorAccount}>
+              <View style={styles.checkboxContainer}>
+                <CheckBox
+                  isChecked={userData.isDoctor}
+                  onClick={toggleCreateDoctorAccount}
+                />
+                <Text style={styles.checkboxLabel}>I am Doctor</Text>
+              </View>
+            </TouchableOpacity>
+            {userData.isDoctor && (
+              <>
+                <TouchableOpacity onPress={handleDocumentSelection}>
+                  <Entypo name="upload" size={24} color="black" />
+                  <Text>Please upload your degree certificate</Text>
+                </TouchableOpacity>
+                <Text numberOfLines={1} ellipsizeMode="middle">
+                  {fileResponse?.uri}
+                </Text>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="eg. (3 years)"
+                  label="Experience"
+                  value={userData.experience}
+                  onChangeText={(text) => handleInputChange("experience", text)}
+                  keyboardType="numeric"
+                />
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="what is your specialization"
+                  label="Specialization"
+                  value={userData.specialization}
+                  onChangeText={(text) => handleInputChange("specialization", text)}
+                />
+              </>
+            )}
           </View>
-        )}
-        <CustomButton title="Proceed" handler={handleProceed} />
-      </View>
+          <CustomButton title="Proceed" handler={handleProceed} />
+        </View>
+      </ScrollView>
+      {loader && (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={Colors.main} />
+          <Text>Please Wait...</Text>
+        </View>
+      )}
     </>
   );
 };
@@ -184,12 +213,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   input: {
-    width: "100%",
-    height: 50,
-    borderWidth: 1,
+    // width: "100%",
+    // height: 50,
+    // borderWidth: 1,
     borderColor: Colors.gray,
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    // borderRadius: 8,
+    // paddingHorizontal: 10,
     marginBottom: 20,
   },
   heading: {

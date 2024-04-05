@@ -25,7 +25,7 @@ export default function App() {
     async function getUserData() {
       try {
         const userData = await getUser();
-        if (userData.uid !== null) {
+        if (userData !== null) {
           console.log(userData);
           setUserData(userData);
           setIsSignedIn(true);

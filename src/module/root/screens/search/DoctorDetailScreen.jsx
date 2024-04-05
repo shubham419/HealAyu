@@ -18,7 +18,7 @@ const DoctorDetailScreen = ({ route }) => {
   const [visible, setVisible] = React.useState(false);
   const { userData, setReload } = useContext(AuthContext);
   const doctorData = route.params.data;
-  
+  console.log(doctorData);
   const bookAppontment = async (date, time) => {
     try {
       const appointmentID = database()
@@ -74,7 +74,7 @@ const DoctorDetailScreen = ({ route }) => {
           style={styles.value}
         >{`${doctorData.name} ${doctorData.lastName}`}</Text>
         <Text style={styles.label}>Specialist:</Text>
-        <Text style={styles.value}>Neurosurgeon</Text>
+        <Text style={styles.value}>{doctorData.specialization}</Text>
         <Text style={styles.label}>Bio:</Text>
         <Text style={styles.bio}>
           Lorem, ipsum dolor sit amet consectetur adipisicing elit. Deleniti
