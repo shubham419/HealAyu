@@ -88,7 +88,7 @@ const AppointmentDetailScreen = ({ route }) => {
     try {
       setLoader(true);
       if (!data.fileLocation) {
-        Toast.show("no file existed to download, please contact team", {
+        Toast.show("no file existed to download, please contact healayu team", {
           duration: Toast.durations.LONG,
         });
         return;

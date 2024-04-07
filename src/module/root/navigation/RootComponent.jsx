@@ -13,6 +13,8 @@ import SearchScreen from "../screens/search/SearchScreen";
 import DoctorDetailScreen from "../screens/search/DoctorDetailScreen";
 import AppointmentDetailScreen from "../screens/home/AppointmentDetailScreen";
 import ProfileScreen from "../screens/profile/ProfileScreen";
+import AboutUsScreen from "../screens/profile/AboutScreen";
+import PrivacyPolicyScreen from "../screens/profile/PrivacyPolicyScreen";
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -59,32 +61,41 @@ const RootComponent = () => {
           ),
         }}
       >
-        {
-          () => (
-            <Stack.Navigator>
-              <Stack.Screen
+        {() => (
+          <Stack.Navigator>
+            <Stack.Screen
               name="SearchScreen"
               component={SearchScreen}
               options={{ headerShown: false }}
-              />
-              <Stack.Screen
+            />
+            <Stack.Screen
               name="DoctorDetailScreen"
               component={DoctorDetailScreen}
               options={{ headerShown: false }}
-              />
-            </Stack.Navigator>
-          )
-        }
+            />
+          </Stack.Navigator>
+        )}
       </Tab.Screen>
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        // component={ProfileScreen}
         options={{
           tabBarIcon: ({ color }) => (
             <Feather name="user" size={24} color={color} />
           ),
         }}
-      />
+      >
+        {() => (
+          <Stack.Navigator>
+            <Stack.Screen  options={{ headerShown: false }} name="ProfileScreen" component={ProfileScreen} />
+            <Stack.Screen name="About Us" component={AboutUsScreen} />
+            <Stack.Screen
+              name="PrivacyPolicyScreen"
+              component={PrivacyPolicyScreen}
+            />
+          </Stack.Navigator>
+        )}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 };

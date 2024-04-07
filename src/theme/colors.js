@@ -1,6 +1,6 @@
 
 const Colors =  {
-    main: "#EE4B2B",
+    main: "#1E7F11",
     black: "#000",
     white: "#fff",
     subHeading:"#808080",

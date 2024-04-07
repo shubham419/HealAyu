@@ -11,6 +11,7 @@ import * as SplashScreen from "expo-splash-screen";
 import AuthContext from "./src/utils/AuthContext";
 import { PaperProvider } from "react-native-paper";
 import { getUser } from "./src/utils/asyncStorage";
+import AboutUsScreen from "./src/module/root/screens/profile/AboutScreen";
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createNativeStackNavigator();
